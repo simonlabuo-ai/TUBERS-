@@ -20,4 +20,88 @@ function showPage(p){['home','watch','upload','shorts','subscriptions','messages
 function watch(i){current=videos[i];showPage('watch');document.getElementById('watchTitle').textContent=current.title;document.getElementById('watchMeta').textContent=current.creator+' · '+current.category;let p=document.getElementById('player');p.innerHTML='';if(current.url){let v=document.createElement('video');v.src=current.url;v.controls=true;v.playsInline=true;p.append(v)}else{let t=document.createElement('div');t.className='thumb';t.style.borderRadius='12px';t.innerHTML='<span style="font-size:60px">'+current.emoji+'</span>';p.append(t)}document.getElementById('likeBtn').textContent='♡ Like'}document.getElementById('likeBtn').onclick=()=>{if(!current)return;let i=videos.indexOf(current);liked.has(i)?liked.delete(i):liked.add(i);document.getElementById('likeBtn').textContent=liked.has(i)?'♥ Liked':'♡ Like'};
 function shareVideo(){if(!current)return;let d={title:'TUBERS',text:current.title+' — TUBERS'};if(navigator.share)navigator.share(d).catch(()=>{});else alert(current.title+' — TUBERS')}
 function previewUpload(){let f=document.getElementById('file').files[0],title=document.getElementById('title').value.trim(),category=document.getElementById('category').value;if(!f){alert('Choose a video file first.');return}if(!title){alert('Enter a title first.');return}if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(f);videos.unshift({title,creator:'You (local preview)',category,emoji:'▶️',url:objectUrl});let pr=document.getElementById('preview');pr.classList.remove('hidden');pr.innerHTML='<p><b>Preview ready: '+escapeHtml(title)+'</b></p><video controls playsinline src="'+objectUrl+'"></video><p class="muted">Only available in this browser session; not public online.</p><button class="primary" id="watchUpload">Watch preview</button>';document.getElementById('watchUpload').onclick=()=>watch(0);render()}function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}render();
-</script></body></html>
+</script>
+
+<style>
+#tubers-create {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: linear-gradient(135deg, #075bff, #ed174c);
+  color: white;
+  border: 0;
+  border-radius: 50%;
+  width: 62px;
+  height: 62px;
+  font-size: 38px;
+  line-height: 1;
+  box-shadow: 0 4px 18px #0005;
+  cursor: pointer;
+}
+#tubers-create-menu {
+  display: none;
+  position: fixed;
+  bottom: 98px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: #151515;
+  padding: 12px;
+  border-radius: 16px;
+  width: 210px;
+  box-shadow: 0 4px 18px #0006;
+}
+#tubers-create-menu button {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin: 5px 0;
+  border: 0;
+  border-radius: 9px;
+  color: white;
+  background: #292929;
+  font-size: 16px;
+  text-align: left;
+}
+#tubers-create-menu button:active {
+  background: #075bff;
+}
+</style>
+
+<button id="tubers-create" aria-label="Create">+</button>
+
+<div id="tubers-create-menu">
+  <button onclick="document.getElementById('tubers-video-file').click()">
+    📹 Upload Video
+  </button>
+  <button onclick="alert('Livestreaming setup is the next step. A streaming service is required.')">
+    🔴 Go Live
+  </button>
+  <button onclick="document.getElementById('tubers-video-file').click()">
+    🎬 Create Short
+  </button>
+</div>
+
+<input id="tubers-video-file" type="file"
+  accept="video/*" hidden>
+
+<script>
+document.getElementById('tubers-create')
+  .addEventListener('click', function () {
+    const menu = document.getElementById('tubers-create-menu');
+    menu.style.display =
+      menu.style.display === 'block' ? 'none' : 'block';
+  });
+
+document.getElementById('tubers-video-file')
+  .addEventListener('change', function () {
+    if (this.files.length) {
+      alert('Video selected: ' + this.files[0].name +
+        '. Video publishing must be connected next.');
+    }
+  });
+</script>
+
+</body></html>
